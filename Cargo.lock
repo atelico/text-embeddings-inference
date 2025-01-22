@@ -500,17 +500,12 @@ name = "candle-core"
 version = "0.5.0"
 source = "git+https://github.com/OlivierDehaene/candle?rev=7e02ad856104799b73a946ac1e153f0de77feaaf#7e02ad856104799b73a946ac1e153f0de77feaaf"
 dependencies = [
- "accelerate-src",
  "byteorder",
- "candle-kernels",
- "candle-metal-kernels",
+ "candle-kernels 0.5.0",
  "cudarc",
  "gemm",
  "half",
- "intel-mkl-src",
- "libc",
  "memmap2",
- "metal",
  "num-traits",
  "num_cpus",
  "rand",
@@ -523,11 +518,38 @@ dependencies = [
 ]
 
 [[package]]
+name = "candle-core"
+version = "0.8.0"
+source = "git+https://github.com/EricLBuehler/candle.git?rev=b4ec636#b4ec636d86c054c84a11aef2d09a9bd8fdc8987d"
+dependencies = [
+ "accelerate-src",
+ "byteorder",
+ "candle-kernels 0.8.0",
+ "candle-metal-kernels",
+ "float8",
+ "gemm",
+ "half",
+ "libc",
+ "memmap2",
+ "metal",
+ "mistralrs_cudarc_fork",
+ "num-traits",
+ "num_cpus",
+ "rand",
+ "rand_distr",
+ "rayon",
+ "safetensors",
+ "thiserror 1.0.69",
+ "yoke",
+ "zip 1.1.4",
+]
+
+[[package]]
 name = "candle-cublaslt"
 version = "0.2.2"
 source = "git+https://github.com/huggingface/candle-cublaslt?rev=cf789b7dd6d4abb19b03b9556442f94f0588b4a0#cf789b7dd6d4abb19b03b9556442f94f0588b4a0"
 dependencies = [
- "candle-core",
+ "candle-core 0.8.0",
  "cudarc",
  "half",
 ]
@@ -539,7 +561,7 @@ source = "git+https://github.com/OlivierDehaene/candle?rev=7e02ad856104799b73a94
 dependencies = [
  "anyhow",
  "bindgen_cuda",
- "candle-core",
+ "candle-core 0.5.0",
  "half",
 ]
 
@@ -549,7 +571,7 @@ version = "0.0.1"
 source = "git+https://github.com/huggingface/candle-flash-attn-v1?rev=3f1870b0d708579904c76e41745c659c3f9fa038#3f1870b0d708579904c76e41745c659c3f9fa038"
 dependencies = [
  "anyhow",
- "candle-core",
+ "candle-core 0.8.0",
  "half",
  "num_cpus",
  "rayon",
@@ -564,12 +586,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "candle-kernels"
+version = "0.8.0"
+source = "git+https://github.com/EricLBuehler/candle.git?rev=b4ec636#b4ec636d86c054c84a11aef2d09a9bd8fdc8987d"
+dependencies = [
+ "bindgen_cuda",
+]
+
+[[package]]
 name = "candle-layer-norm"
 version = "0.0.1"
 source = "git+https://github.com/huggingface/candle-layer-norm?rev=94c2add7d94c2d63aebde77f7534614e04dbaea1#94c2add7d94c2d63aebde77f7534614e04dbaea1"
 dependencies = [
  "anyhow",
- "candle-core",
+ "candle-core 0.8.0",
  "half",
  "num_cpus",
  "rayon",
@@ -577,8 +607,8 @@ dependencies = [
 
 [[package]]
 name = "candle-metal-kernels"
-version = "0.5.0"
-source = "git+https://github.com/OlivierDehaene/candle?rev=7e02ad856104799b73a946ac1e153f0de77feaaf#7e02ad856104799b73a946ac1e153f0de77feaaf"
+version = "0.8.0"
+source = "git+https://github.com/EricLBuehler/candle.git?rev=b4ec636#b4ec636d86c054c84a11aef2d09a9bd8fdc8987d"
 dependencies = [
  "metal",
  "once_cell",
@@ -588,14 +618,13 @@ dependencies = [
 
 [[package]]
 name = "candle-nn"
-version = "0.5.0"
-source = "git+https://github.com/OlivierDehaene/candle?rev=7e02ad856104799b73a946ac1e153f0de77feaaf#7e02ad856104799b73a946ac1e153f0de77feaaf"
+version = "0.8.0"
+source = "git+https://github.com/EricLBuehler/candle.git?rev=b4ec636#b4ec636d86c054c84a11aef2d09a9bd8fdc8987d"
 dependencies = [
  "accelerate-src",
- "candle-core",
+ "candle-core 0.8.0",
  "candle-metal-kernels",
  "half",
- "intel-mkl-src",
  "metal",
  "num-traits",
  "rayon",
@@ -611,17 +640,17 @@ source = "git+https://github.com/huggingface/candle-rotary?rev=0a718a0856569a92f
 dependencies = [
  "anyhow",
  "bindgen_cuda",
- "candle-core",
+ "candle-core 0.8.0",
  "half",
 ]
 
 [[package]]
 name = "candle-transformers"
-version = "0.5.0"
-source = "git+https://github.com/OlivierDehaene/candle?rev=7e02ad856104799b73a946ac1e153f0de77feaaf#7e02ad856104799b73a946ac1e153f0de77feaaf"
+version = "0.8.0"
+source = "git+https://github.com/EricLBuehler/candle.git?rev=b4ec636#b4ec636d86c054c84a11aef2d09a9bd8fdc8987d"
 dependencies = [
  "byteorder",
- "candle-core",
+ "candle-core 0.8.0",
  "candle-nn",
  "fancy-regex",
  "num-traits",
@@ -1168,6 +1197,19 @@ checksum = "c936bfdafb507ebbf50b8074c54fa31c5be9a1e7e5f467dd659697041407d07c"
 dependencies = [
  "crc32fast",
  "miniz_oxide",
+]
+
+[[package]]
+name = "float8"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ea7c017f762b1198f03787816240bd8d07eb3dcea71262f6646b86d319b71460"
+dependencies = [
+ "half",
+ "mistralrs_cudarc_fork",
+ "num-traits",
+ "rand",
+ "rand_distr",
 ]
 
 [[package]]
@@ -2401,6 +2443,16 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "mistralrs_cudarc_fork"
+version = "0.12.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c82ee900a0e7080a2ff91042d070b0112a3533b32ebc6d8faaba96ee4f598e8d"
+dependencies = [
+ "half",
+ "libloading",
 ]
 
 [[package]]
@@ -4245,7 +4297,7 @@ version = "1.6.0"
 dependencies = [
  "accelerate-src",
  "anyhow",
- "candle-core",
+ "candle-core 0.8.0",
  "candle-cublaslt",
  "candle-flash-attn",
  "candle-flash-attn-v1",
