@@ -9,9 +9,13 @@ homepage.workspace = true
 anyhow = { workspace = true }
 accelerate-src = { version = "0.3.2", optional = true }
 intel-mkl-src = { version = "0.8.1", optional = true }
-candle = { version = "*", package = "candle-core", default-features = false }
-candle-nn = { version = "*" }
-candle-transformers = { version = "*" }
+# candle = { version = "*", package = "candle-core", default-features = false }
+candle = { git = "https://github.com/EricLBuehler/candle.git", rev = "b4ec636", package = "candle-core", default-features = false }
+# candle-nn = { version = "*" }
+candle-nn = { git = "https://github.com/EricLBuehler/candle.git", rev = "b4ec636", package = "candle-nn" }
+
+# candle-transformers = { version = "*" }
+candle-transformers = { git = "https://github.com/EricLBuehler/candle.git", rev = "b4ec636", package = "candle-transformers" }
 candle-flash-attn = { version = "*", optional = true }
 candle-flash-attn-v1 = { git = "https://github.com/huggingface/candle-flash-attn-v1", rev = "3f1870b0d708579904c76e41745c659c3f9fa038", optional = true }
 candle-cublaslt = { git = "https://github.com/huggingface/candle-cublaslt", rev = "cf789b7dd6d4abb19b03b9556442f94f0588b4a0", optional = true }
