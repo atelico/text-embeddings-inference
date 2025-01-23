@@ -46,7 +46,7 @@ pub enum BertConfigWrapper {
     Bert(BertConfig),
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 #[serde(tag = "model_type", rename_all = "kebab-case")]
 enum Config {
     Bert(BertConfigWrapper),
@@ -80,14 +80,18 @@ impl CandleBackend {
         let default_safetensors = model_path.join("model.safetensors");
         let default_pytorch = model_path.join("pytorch_model.bin");
 
+        println!("Loading model from {:?}", model_path);
         // Single Files
         let model_files = if default_safetensors.exists() {
+            println!("Loading model from {:?}", default_safetensors);
             vec![default_safetensors]
         } else if default_pytorch.exists() {
+            println!("Loading model from {:?}", default_pytorch);
             vec![default_pytorch]
         }
         // Sharded weights
         else {
+            println!("Loading sharded model from {:?}", model_path);
             // Get index file
             let index_file = model_path.join("model.safetensors.index.json");
 
@@ -123,7 +127,7 @@ impl CandleBackend {
                 .map(|n| model_path.join(n))
                 .collect()
         };
-
+        println!("Model files: {:?}", model_files);
         // Load config
         let config: String = std::fs::read_to_string(model_path.join("config.json"))
             .context("Unable to read config file")
@@ -132,6 +136,7 @@ impl CandleBackend {
             .context("Model is not supported")
             .map_err(|err| BackendError::Start(format!("{err:?}")))?;
 
+        println!("Model config: {:?}", config);
         // Get candle device
         let device = if candle::utils::cuda_is_available() {
             #[cfg(feature = "cuda")]
@@ -153,12 +158,15 @@ impl CandleBackend {
             #[cfg(not(feature = "cuda"))]
             Ok(Device::Cpu)
         } else if candle::utils::metal_is_available() {
+            println!("Using Metal device");
             Device::new_metal(0)
         } else {
+            println!("Using CPU device");
             Ok(Device::Cpu)
         }
         .map_err(|err| BackendError::Start(err.to_string()))?;
 
+        println!("Device: {:?}", device);
         // Get candle dtype
         let dtype = if &dtype == "float32" {
             Ok(DType::F32)
@@ -169,6 +177,7 @@ impl CandleBackend {
                 "DType {dtype} is not supported"
             )))
         }?;
+        println!("DType: {:?}", dtype);
 
         let vb = if model_files.len() == 1 && model_files[0].extension().unwrap() == "bin" {
             VarBuilder::from_pth(&model_files[0], dtype, &device)
@@ -176,6 +185,8 @@ impl CandleBackend {
             unsafe { VarBuilder::from_mmaped_safetensors(&model_files, dtype, &device) }
         }
         .s()?;
+
+        println!("Post VB, check type: {:?}", model_type);
 
         let model: Result<Box<dyn Model + Send>, BackendError> = match (config, &device) {
             #[cfg(not(feature = "cuda"))]
