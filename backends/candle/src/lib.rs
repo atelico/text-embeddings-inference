@@ -76,6 +76,14 @@ impl CandleBackend {
         dtype: String,
         model_type: ModelType,
     ) -> Result<Self, BackendError> {
+        Self::new_with_device(model_path, dtype, model_type, None)
+    }
+    pub fn new_with_device(
+        model_path: &Path,
+        dtype: String,
+        model_type: ModelType,
+        device: Option<Device>,
+    ) -> Result<Self, BackendError> {
         // Default files
         let default_safetensors = model_path.join("model.safetensors");
         let default_pytorch = model_path.join("pytorch_model.bin");
@@ -138,34 +146,41 @@ impl CandleBackend {
 
         println!("Model config: {:?}", config);
         // Get candle device
-        let device = if candle::utils::cuda_is_available() {
-            #[cfg(feature = "cuda")]
-            match compatible_compute_cap() {
-                Ok(true) => Device::new_cuda(0),
-                Ok(false) => {
-                    return Err(BackendError::Start(format!(
+        let device = match device {
+            Some(device) => device,
+            None => {
+                let to_ret = if candle::utils::cuda_is_available() {
+                    #[cfg(feature = "cuda")]
+                    match compatible_compute_cap() {
+                        Ok(true) => Device::new_cuda(0),
+                        Ok(false) => {
+                            return Err(BackendError::Start(format!(
                         "Runtime compute cap {} is not compatible with compile time compute cap {}",
                         get_runtime_compute_cap().unwrap(),
                         get_compile_compute_cap().unwrap()
                     )));
-                }
-                Err(err) => {
-                    tracing::warn!("Could not find a compatible CUDA device on host: {err:?}");
-                    tracing::warn!("Using CPU instead");
+                        }
+                        Err(err) => {
+                            tracing::warn!(
+                                "Could not find a compatible CUDA device on host: {err:?}"
+                            );
+                            tracing::warn!("Using CPU instead");
+                            Ok(Device::Cpu)
+                        }
+                    }
+                    #[cfg(not(feature = "cuda"))]
+                    Ok(Device::Cpu)
+                } else if candle::utils::metal_is_available() {
+                    println!("Using Metal device");
+                    Device::new_metal(0)
+                } else {
+                    println!("Using CPU device");
                     Ok(Device::Cpu)
                 }
+                .map_err(|err| BackendError::Start(err.to_string()))?;
+                to_ret
             }
-            #[cfg(not(feature = "cuda"))]
-            Ok(Device::Cpu)
-        } else if candle::utils::metal_is_available() {
-            println!("Using Metal device");
-            Device::new_metal(0)
-        } else {
-            println!("Using CPU device");
-            Ok(Device::Cpu)
-        }
-        .map_err(|err| BackendError::Start(err.to_string()))?;
-
+        };
         println!("Device: {:?}", device);
         // Get candle dtype
         let dtype = if &dtype == "float32" {
